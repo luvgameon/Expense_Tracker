@@ -36,6 +36,7 @@ function Login() {
           );
           console.log(respose);
           console.log("User has successfully logged in",respose.data.idToken);
+          localStorage.setItem('idToken',respose.data.idToken);
           navigate("/expenses")
         
         
