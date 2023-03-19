@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
 import axios from "axios";
+import {Link,useNavigate} from 'react-router-dom';
 import {
   MDBBtn,
   MDBContainer,
@@ -12,32 +13,46 @@ import {
   MDBIcon,
 } from "mdb-react-ui-kit";
 
-function Signup() {
-  const nameref = useRef("");
+function Login() {
+    const  navigate=useNavigate();
+ 
   const emailref = useRef("");
   const passref = useRef("");
-  const cnfpassref = useRef("");
+
   const submithandler = async (event) => {
     event.preventDefault();
-    if (passref.current.value === cnfpassref.current.value) {
+    
       const Userdetails = {
         email: emailref.current.value,
         password: passref.current.value,
         returnSecureToken: true,
       };
-      nameref.current.value = "";
-      nameref.current.value = "";
+      emailref.current.value="";
       passref.current.value = "";
-      cnfpassref.current.value = "";
-      await axios.post(
-        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDW55X8yrfY3DYfPEVnvQZamzWMl7FuhzE",
-        Userdetails
-      );
+     try {
+        const respose = await axios.post(
+            "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDW55X8yrfY3DYfPEVnvQZamzWMl7FuhzE",
+            Userdetails
+          );
+          console.log(respose);
+          console.log("User has successfully logged in",respose.data.idToken);
+          navigate("/expenses")
+        
+        
+     } catch (error) {
+        console.log(error.response.data.error.message)
+        alert(error.response.data.error.message);
+     }
+      
+      
+      
+      
+       
 
-      console.log("User has successfully signed up");
-    } else {
-      alert("Wrong Pass");
-    }
+      
+     
+    //   alert("Password Doesn't Match");
+    
   };
 
   return (
@@ -52,19 +67,9 @@ function Signup() {
                 className="order-2 order-lg-1 d-flex flex-column align-items-center"
               >
                 <p classNAme="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">
-                  Sign up
+                  Login
                 </p>
-                <div className="d-flex flex-row align-items-center mb-4 ">
-                  <MDBIcon fas icon="user me-3" size="lg" />
-                  <MDBInput
-                    label="Your Name"
-                    id="form1"
-                    type="text"
-                    className="w-100"
-                    ref={nameref}
-                    required
-                  />
-                </div>
+                
                 <div className="d-flex flex-row align-items-center mb-4">
                   <MDBIcon fas icon="envelope me-3" size="lg" />
                   <MDBInput
@@ -85,22 +90,15 @@ function Signup() {
                     required
                   />
                 </div>
-                <div className="d-flex flex-row align-items-center mb-4">
-                  <MDBIcon fas icon="key me-3" size="lg" />
-                  <MDBInput
-                    label="Repeat your password"
-                    id="form4"
-                    type="password"
-                    ref={cnfpassref}
-                    required
-                  />
-                </div>
+               
                 <MDBBtn className="mb-4" size="lg" type="submit">
-                  Register
+                  Login
                 </MDBBtn>
-                Already Have An Account
-                <MDBBtn className="mx-2" color="tertiary" rippleColor="light">
-                  Login Now!
+                Don't Have An Account
+                <MDBBtn className="mx-2" color="tertiary" rippleColor="light" >
+                <Link to='/'>
+                  Sign Up Now
+                </Link> 
                 </MDBBtn>
               </MDBCol>
 
@@ -122,4 +120,4 @@ function Signup() {
   );
 }
 
-export default Signup;
+export default Login;
