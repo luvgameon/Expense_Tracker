@@ -3,6 +3,8 @@ import axios from "axios";
 
 export default function Profile() {
   const [first, setfirst] = useState([]);
+ 
+ 
   const nameref = useRef("");
   const photourl = useRef("");
   const idToken = localStorage.getItem("idToken");
@@ -15,6 +17,7 @@ export default function Profile() {
         "https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyDW55X8yrfY3DYfPEVnvQZamzWMl7FuhzE",
         token
       );
+      
 
       setfirst(response);
     }
@@ -52,6 +55,26 @@ export default function Profile() {
       alert(error.response.data.error.message);
     }
   };
+
+  const verify=async(event)=>{
+    event.preventDefault();
+    const idToken = localStorage.getItem("idToken");
+    const details = {
+      requestType:"VERIFY_EMAIL",
+      idToken: idToken
+     }
+     try {
+        const response = await axios.post(
+          "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=AIzaSyDW55X8yrfY3DYfPEVnvQZamzWMl7FuhzE",
+          details
+        );
+        console.log("Email Send successful", response.data.email);
+        localStorage.setItem('email',response.data.email);
+      } catch (error) {
+        alert(error.response.data.error.message);
+      }
+
+}
   return (
     <div>
       <h3 className="text-center">Contacts Details</h3>
@@ -71,7 +94,13 @@ export default function Profile() {
             data-mdb-ripple-color="dark"
           >
             Update
-          </button>
+          </button> &nbsp; {!(localStorage.getItem('email')!==null) && <button
+            onClick={verify}
+            class="btn btn-outline-dark"
+            data-mdb-ripple-color="dark"
+          >
+            Verify Email
+          </button> }
         </form>
       </div>
     </div>
