@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   MDBBtn,
   MDBContainer,
@@ -8,19 +8,45 @@ import {
   MDBCardBody,
   MDBInput,
 } from "mdb-react-ui-kit";
+import axios from "axios";
 
 export default function AddExpense() {
   const [expense, setexpense] = useState([]);
+  useEffect(() => {
+    async function myfun() {
+      const data = await axios.get(
+        "https://expense-tracker-a7536-default-rtdb.firebaseio.com/expenses.json?print=pretty"
+      );
+      const respose = data.data;
+
+      const trasformData = [];
+      for (const key in respose) {
+        trasformData.push({
+          id: key,
+          price: respose[key].price,
+          des: respose[key].des,
+          cat: respose[key].cat,
+        });
+      }
+      setexpense(trasformData);
+    }
+    myfun();
+  }, []);
+
   const categoryvalue = useRef();
   const pricevalue = useRef();
   const desvalue = useRef();
-  const submithandler = (event) => {
+  const submithandler = async (event) => {
     event.preventDefault();
     const details = {
       price: pricevalue.current.value,
       des: desvalue.current.value,
       cat: categoryvalue.current.value,
     };
+    axios.post(
+      "https://expense-tracker-a7536-default-rtdb.firebaseio.com/expenses.json",
+      details
+    );
     setexpense([...expense, details]);
     pricevalue.current.value = "";
     desvalue.current.value = "";
@@ -83,7 +109,11 @@ export default function AddExpense() {
                 className="order-1 order-lg-2 d-flex align-items-center"
               >
                 <table class="table">
-            {expense.length===0 && <h3 className="text-center my-2">No Expense Found Please Add</h3>}
+                  {expense.length === 0 && (
+                    <h3 className="text-center my-2">
+                      No Expense Found Please Add
+                    </h3>
+                  )}
                   <thead class="table-dark">
                     <tr>
                       <th scope="col">Price</th>
