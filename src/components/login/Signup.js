@@ -106,11 +106,11 @@ function Signup() {
                   Register
                 </MDBBtn>
                 Already Have An Account
-                <MDBBtn className="mx-2" color="tertiary" rippleColor="light" >
+                <span className="mx-2" color="tertiary" rippleColor="light" >
                 <Link to='/login'>
                   Login Now
                 </Link> 
-                </MDBBtn>
+                </span>
               </MDBCol>
 
               <MDBCol
