@@ -1,6 +1,6 @@
-import React, { useRef } from "react";
+import React, { useContext, useRef } from "react";
 import axios from "axios";
-import {Link,useNavigate} from 'react-router-dom';
+import {Link,useHistory} from 'react-router-dom';
 import {
   MDBBtn,
   MDBContainer,
@@ -12,9 +12,13 @@ import {
   MDBInput,
   MDBIcon,
 } from "mdb-react-ui-kit";
+import AuthContext from "../../store/auth-context";
+
 
 function Login() {
-    const  navigate=useNavigate();
+  const auth=useContext(AuthContext);
+  
+    const  history=useHistory();
  
   const emailref = useRef("");
   const passref = useRef("");
@@ -37,7 +41,9 @@ function Login() {
           console.log(respose);
           console.log("User has successfully logged in",respose.data.idToken);
           localStorage.setItem('idToken',respose.data.idToken);
-          navigate("/expenses")
+              auth.login(localStorage.getItem('idToken'));
+          history.replace('/expenses');
+
         
         
      } catch (error) {
