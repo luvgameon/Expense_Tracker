@@ -12,6 +12,66 @@ import axios from "axios";
 
 export default function AddExpense() {
   const [expense, setexpense] = useState([]);
+  const [edit, setedit] = useState(false);
+  const [id, setid] = useState("");
+
+  const categoryvalue = useRef();
+  const pricevalue = useRef();
+  const desvalue = useRef();
+
+  const editexpense = (price, des, cat, idvalue) => {
+    setedit(true);
+    setid(idvalue);
+
+    pricevalue.current.value = price;
+    desvalue.current.value = des;
+    categoryvalue.current.value = cat;
+  };
+  const submithandler = async (event) => {
+    event.preventDefault();
+
+    if (edit) {
+      const details = {
+        price: pricevalue.current.value,
+        des: desvalue.current.value,
+        cat: categoryvalue.current.value,
+      };
+      const response = await axios.put(
+        `https://expense-tracker-a7536-default-rtdb.firebaseio.com/expenses/${id}.json`,
+        details
+      );
+      if (response.status === 200) {
+        console.log("Expense successfuly Updated");
+        setedit(false);
+      }
+      pricevalue.current.value = "";
+      desvalue.current.value = "";
+      categoryvalue.current.value = "";
+    } else {
+      const details = {
+        price: pricevalue.current.value,
+        des: desvalue.current.value,
+        cat: categoryvalue.current.value,
+      };
+      axios.post(
+        "https://expense-tracker-a7536-default-rtdb.firebaseio.com/expenses.json",
+        details
+      );
+      setexpense([...expense, details]);
+      pricevalue.current.value = "";
+      desvalue.current.value = "";
+      categoryvalue.current.value = "";
+    }
+  };
+  const deleteexpense = async (id) => {
+    setid(id);
+    const respose = await axios.delete(
+      `https://expense-tracker-a7536-default-rtdb.firebaseio.com/expenses/${id}.json`
+    );
+    if (respose.status === 200) {
+      console.log("SUCCESSFULLY DELETE EXPENSE");
+    }
+  };
   useEffect(() => {
     async function myfun() {
       const data = await axios.get(
@@ -31,27 +91,8 @@ export default function AddExpense() {
       setexpense(trasformData);
     }
     myfun();
-  }, []);
+  }, [submithandler, deleteexpense]);
 
-  const categoryvalue = useRef();
-  const pricevalue = useRef();
-  const desvalue = useRef();
-  const submithandler = async (event) => {
-    event.preventDefault();
-    const details = {
-      price: pricevalue.current.value,
-      des: desvalue.current.value,
-      cat: categoryvalue.current.value,
-    };
-    axios.post(
-      "https://expense-tracker-a7536-default-rtdb.firebaseio.com/expenses.json",
-      details
-    );
-    setexpense([...expense, details]);
-    pricevalue.current.value = "";
-    desvalue.current.value = "";
-    categoryvalue.current.value = "";
-  };
   return (
     <form onSubmit={submithandler}>
       <MDBContainer fluid>
@@ -94,12 +135,13 @@ export default function AddExpense() {
                     <option value="Fuel">Fuel</option>
                     <option value="Movie">Movie</option>
                     <option value="Travel">Travel</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
                 <br />
 
                 <MDBBtn className="mb-4" size="lg" type="submit">
-                  Add Expense
+                  {edit ? "update" : "Add Expense"}
                 </MDBBtn>
               </MDBCol>
 
@@ -119,6 +161,8 @@ export default function AddExpense() {
                       <th scope="col">Price</th>
                       <th scope="col">Descrpition</th>
                       <th scope="col">Category</th>
+                      <th scope="col">edit</th>
+                      <th scope="col">Delete</th>
                     </tr>
                   </thead>
 
@@ -128,6 +172,33 @@ export default function AddExpense() {
                         <td>{item.price}</td>
                         <td>{item.des}</td>
                         <td>{item.cat}</td>
+                        <td>
+                          {
+                            <i
+                              className="fas fa-pen"
+                              style={{ cursor: "pointer" }}
+                              onClick={() => {
+                                editexpense(
+                                  item.price,
+                                  item.des,
+                                  item.cat,
+                                  item.id
+                                );
+                              }}
+                            />
+                          }
+                        </td>
+                        <td>
+                          {
+                            <i
+                              className="fas fa-trash"
+                              style={{ cursor: "pointer" }}
+                              onClick={() => {
+                                deleteexpense(item.id);
+                              }}
+                            />
+                          }
+                        </td>
                       </tr>
                     ))}
                   </tbody>
