@@ -1,5 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import AddExpense from './AddExpense'
 
 
 export default function Expenses() {
@@ -12,6 +13,7 @@ export default function Expenses() {
      
       </nav>
       <hr />
+      <AddExpense/>
 
     </div>
   )
