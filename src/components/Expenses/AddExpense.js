@@ -10,11 +10,14 @@ import {
 } from "mdb-react-ui-kit";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
-import { expenseActions} from "../../store/redux";
+import { expenseActions, themeActions} from "../../store/redux";
+import { saveAs } from "file-saver";
 
 export default function AddExpense() {
   const dispatch = useDispatch();
   let expense = useSelector((state) => state.expense.expense);
+  const darktheme=useSelector((state)=>state.theme.darktheme)
+  console.log('darktheme',darktheme);
  
   // const [expense, setexpense] = useState([]);
   const [trigger, settrigger] = useState(false);
@@ -125,13 +128,33 @@ export default function AddExpense() {
   console.log(c);
 
   const themechange = () => {
+    dispatch(themeActions.changetheme());
     console.log("Theme change Successful");
+  };
+  //<----------------------------------------DOWNLOAD EXPENSE----------------------------------------->
+  const onDownloadClickHandler = () => {
+    const csv = Object.entries(expense).map((expense) => {
+      // return ["Col1", "Col2", "Col3"]
+      
+      return [expense[1].price, expense[1].des, expense[1].cat];
+    });
+
+    console.log(csv);
+    const makeCSV = (rows) => {
+      return rows.map((r) => r.join(",")).join("\n");
+    };
+
+    const blob1 = new Blob([makeCSV(csv)]);
+
+    
+    const temp = URL.createObjectURL(blob1)
+    saveAs(temp, "file1.csv")
   };
 
   return (
     <form onSubmit={submithandler}>
       <MDBContainer fluid>
-        <MDBCard className="text-black m-5" style={{ borderRadius: "25px" }}>
+        <MDBCard className={darktheme ? 'text-black card text-white bg-dark mb-3':'text-black'} style={{ borderRadius: "25px" }}>
           <MDBCardBody>
             <MDBRow>
               <MDBCol
@@ -201,7 +224,7 @@ export default function AddExpense() {
                     </tr>
                   </thead>
 
-                  <tbody>
+                  <tbody className={darktheme ?"text-white":''}>
                     {expense.map((item) => (
                       <tr>
                         <td>{item.price}</td>
@@ -245,13 +268,24 @@ export default function AddExpense() {
                       onClick={themechange}
                     >
                       {" "}
-                      activate Premium
+                      {darktheme  ? 'Deactivate Premium':'activate Premium'}
                     </MDBBtn>
-                  )}
+                    
+                    
+                  )} &nbsp; { darktheme && 
+                    
+
+                    <button style={{textAlign:"center"}} type="button" class="btn btn-light  " onClick={onDownloadClickHandler}>Download Expense</button>}
+                
+                
                 </table>
+                
               </MDBCol>
+            
             </MDBRow>
+            
           </MDBCardBody>
+          
         </MDBCard>
       </MDBContainer>
     </form>
