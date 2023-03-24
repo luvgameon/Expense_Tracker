@@ -6,11 +6,14 @@ import Login from "./components/login/Login";
 import Signup from "./components/login/Signup";
 import Profile from "./components/profile/Profile";
 import AuthContext from "./store/auth-context";
+import { useSelector } from 'react-redux';
 
 function App() {
-  const auth = useContext(AuthContext);
-  const login = auth.islogin;
-  console.log('login',login)
+  // const auth = useContext(AuthContext);
+  // const login = auth.islogin;
+  const auth=useSelector((state) => state.auth);
+  const login =auth.token==null?false:true;
+  console.log('login',auth.token,login)
   return (
     <>
       <Switch>
